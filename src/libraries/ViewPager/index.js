@@ -109,13 +109,13 @@ export default class ViewPager extends PureComponent {
         const finalX = this.getScrollOffsetOfPage(page);
         this.scroller.startScroll(this.scroller.getCurrX(), 0, finalX - this.scroller.getCurrX(), 0, 0);
         
-        requestAnimationFrame(() => {
-            // this is here to work around a bug in FlatList, as discussed here
-            // https://github.com/facebook/react-native/issues/1831
-            // (and solved here https://github.com/facebook/react-native/commit/03ae65bc ?)
-            this.scrollByOffset(1);
-            this.scrollByOffset(-1);
-        });
+        // requestAnimationFrame(() => {
+        //     // this is here to work around a bug in FlatList, as discussed here
+        //     // https://github.com/facebook/react-native/issues/1831
+        //     // (and solved here https://github.com/facebook/react-native/commit/03ae65bc ?)
+        //     this.scrollByOffset(1);
+        //     this.scrollByOffset(-1);
+        // });
     }
 
     componentDidUpdate (prevProps) {
@@ -244,14 +244,7 @@ export default class ViewPager extends PureComponent {
         return this.scroller.getCurrX() - this.getScrollOffsetOfPage(this.currentPage);
     }
 
-    getItemLayout (data, index) {
-        // this method is called 'getItemLayout', but it is not actually used
-        // as the 'getItemLayout' function for the FlatList. We use it within
-        // the code on this page though. The reason for this is that working
-        // with 'getItemLayout' for FlatList is buggy. You might end up with
-        // unrendered / missing content. Therefore we work around it, as
-        // described here
-        // https://github.com/facebook/react-native/issues/15734#issuecomment-330616697
+    getItemLayout =  (data, index) => {
         return {
             length: this.state.width + this.props.pageMargin,
             offset: (this.state.width + this.props.pageMargin) * index,
@@ -319,18 +312,20 @@ export default class ViewPager extends PureComponent {
                   {...this.props.flatListProps}
                   style={[{ flex: 1 }, scrollViewStyle]}
                   ref={'innerFlatList'}
+                  initialScrollIndex={this.props.initialPage}
                   keyExtractor={this.keyExtractor}
                   scrollEnabled={false}
                   horizontal={true}
                   data={pageDataArray}
                   renderItem={this.renderRow}
                   onLayout={this.onLayout}
+                  getItemLayout={this.getItemLayout}
 
                   // use contentOffset instead of initialScrollIndex so that we don't have
                   // to use the buggy 'getItemLayout' prop. See
                   // https://github.com/facebook/react-native/issues/15734#issuecomment-330616697 and
                   // https://github.com/facebook/react-native/issues/14945#issuecomment-354651271
-                  contentOffset = {{x: this.getScrollOffsetOfPage(parseInt(this.props.initialPage)), y:0}}
+                  //contentOffset = {{x: this.getScrollOffsetOfPage(parseInt(this.props.initialPage)), y:0}}
               />
             </View>
         );
